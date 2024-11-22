@@ -21,12 +21,19 @@ class KafkaClient:
         if self.producer:
             await self.producer.stop()
 
-    async def send_log(self, user_id: int | None, action: str):
+    async def send_log(
+        self, action: str, user_id: int = None, cargo_type: str = None, date: str = None
+    ):
         message = {
-            "user_id": user_id,
             "action": action,
             "timestamp": utcnow(),
         }
+        if user_id:
+            message.update({"user_id": user_id})
+        if cargo_type:
+            message.update({"cargo_type": cargo_type})
+        if date:
+            message.update({"date": date})
         await self.producer.send_and_wait("insurance_logs", message)
 
 

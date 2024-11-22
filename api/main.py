@@ -5,6 +5,7 @@ from fastapi import FastAPI, APIRouter, Response, status, Request
 from contextlib import asynccontextmanager
 
 from kafka.conf import kafka_client
+from api.routes.user import user_router
 from api.routes.tariff import tariff_router
 
 
@@ -50,6 +51,7 @@ async def debug_exception_handler(request: Request, exc: Exception):
 
 
 router = APIRouter(prefix="/api")
+router.include_router(user_router, prefix="/user")
 router.include_router(tariff_router, prefix="/tariff")
 
 app.include_router(router)

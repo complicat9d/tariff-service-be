@@ -2,6 +2,7 @@ import datetime
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 
 import db.models as m
 from schemas.exc import TariffNotFoundException, TariffAlreadyExistsException
@@ -32,24 +33,17 @@ async def get_tariff(session: AsyncSession, date: datetime.date, cargo_type: str
 
 
 async def create_tariff(session: AsyncSession, request: TariffCreateSchema):
-    q = sa.select(m.Tariff.cargo_type).filter(
-        sa.and_(
-            m.Tariff.cargo_type == request.cargo_type, m.Tariff.date == request.date
+    try:
+        q = sa.insert(m.Tariff).values(
+            {
+                m.Tariff.cargo_type: request.cargo_type,
+                m.Tariff.date: request.date,
+                m.Tariff.rate: request.rate,
+            }
         )
-    )
-    exists = (await session.execute(q)).scalar()
-
-    if exists:
+        await session.execute(q)
+    except IntegrityError:
         raise TariffAlreadyExistsException
-
-    q = sa.insert(m.Tariff).values(
-        {
-            m.Tariff.cargo_type: request.cargo_type,
-            m.Tariff.date: request.date,
-            m.Tariff.rate: request.rate,
-        }
-    )
-    await session.execute(q)
 
 
 async def update_tariff(session: AsyncSession, request: TariffUpdateSchema):

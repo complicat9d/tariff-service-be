@@ -12,6 +12,9 @@ class Settings(BaseSettings):
 
     KAFKA_BROKER: str
 
+    JWT_SECRET: str
+    TOKEN_EXPIRATION_DELTA: int = 10
+
     DEBUG_ENGINE: bool = False
 
 
