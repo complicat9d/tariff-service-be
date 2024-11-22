@@ -2,13 +2,19 @@ import uvicorn
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, APIRouter, Response, status, Request
-from starlette.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
+
+from kafka.conf import kafka_client
+from api.routes.tariff import tariff_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    yield
+    await kafka_client.start()
+    try:
+        yield
+    finally:
+        await kafka_client.stop()
 
 
 app = FastAPI(lifespan=lifespan)
@@ -44,6 +50,9 @@ async def debug_exception_handler(request: Request, exc: Exception):
 
 
 router = APIRouter(prefix="/api")
+router.include_router(tariff_router, prefix="/tariff")
+
+app.include_router(router)
 
 
 if __name__ == "__main__":

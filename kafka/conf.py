@@ -1,7 +1,7 @@
 import orjson as json
 from aiokafka import AIOKafkaProducer
 
-from utils.utcnow import utcnow
+from utils.time_utils import utcnow
 from config import settings
 
 
@@ -12,8 +12,7 @@ class KafkaClient:
 
     async def start(self):
         self.producer = AIOKafkaProducer(
-            bootstrap_servers=self.broker_url,
-            value_serializer=lambda v: json.dumps(v)
+            bootstrap_servers=self.broker_url, value_serializer=lambda v: json.dumps(v)
         )
         # Start the producer
         await self.producer.start()
@@ -22,7 +21,7 @@ class KafkaClient:
         if self.producer:
             await self.producer.stop()
 
-    async def send_log(self, user_id: int, action: str):
+    async def send_log(self, user_id: int | None, action: str):
         message = {
             "user_id": user_id,
             "action": action,
