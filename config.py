@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     DATABASE_PASSWORD: str = "postgres"
     DATABASE_DB: str = "postgres"
 
-    KAFKA_BROKER: str
+    KAFKA_BROKER: str = "kafka:9092"
 
     JWT_SECRET: str
     TOKEN_EXPIRATION_DELTA: int = 10

@@ -11,19 +11,23 @@ services:
       - .env
     ports:
       - "8000:8000"
+    depends_on:
+      kafka:
+        condition: service_healthy
     networks:
       - app-network
 
   db:
     image: postgres:16-alpine
     restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
     volumes:
-      - ./db:/var/lib/postgresql/data
+      - ./postgres_db:/var/lib/postgresql/data
       - ./postgresql.conf:/etc/postgresql/postgresql.conf
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     command:
       - "postgres"
       - "-c"
@@ -41,22 +45,34 @@ services:
     env_file:
       - .env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
     networks:
       - app-network
 
   kafka:
-    restart: always
-    image: docker.io/bitnami/kafka:3.3
+    image: wurstmeister/kafka
     ports:
       - "9092:9092"
-    volumes:
-      - "kafka-volume:/bitnami"
     environment:
-      - KAFKA_BROKER_ID=1
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "kafka", "9092" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - app-network
+
 
 networks:
   app-network:

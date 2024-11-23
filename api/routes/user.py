@@ -22,7 +22,7 @@ async def _create_user(request: UserCreateSchema, session: session_dep):
     except IntegrityError:
         raise UserAlreadyExistsException
     logger.info(
-        f"Client with email {request.username} has been successfully registered"
+        f"Client with username {request.username} has been successfully registered"
     )
     return TokenResponse(access_token=create_jwt_access_token(client_id))
 

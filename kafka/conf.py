@@ -14,7 +14,7 @@ class KafkaClient:
         self.producer = AIOKafkaProducer(
             bootstrap_servers=self.broker_url, value_serializer=lambda v: json.dumps(v)
         )
-        # Start the producer
+
         await self.producer.start()
 
     async def stop(self):
@@ -34,7 +34,7 @@ class KafkaClient:
             message.update({"cargo_type": cargo_type})
         if date:
             message.update({"date": date})
-        await self.producer.send_and_wait("insurance_logs", message)
+        await self.producer.send_and_wait("logs", message)
 
 
 kafka_client = KafkaClient(broker_url=settings.KAFKA_BROKER)

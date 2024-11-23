@@ -12,6 +12,7 @@ from schemas.exc import (
     IncorrectPasswordException,
     UserNotFoundException,
     UserAuthenticationFailedException,
+    UserExpiredTokenException,
 )
 from schemas.security import TokenData
 
@@ -44,7 +45,7 @@ async def get_current_client(token: oauth2_dep, session: session_dep) -> UserSch
     except PyJWTError:
         raise UserAuthenticationFailedException
     except ExpiredSignatureError:
-        raise User
+        raise UserExpiredTokenException
 
 
 user_dep = Annotated[UserSchema, Depends(get_current_client)]
