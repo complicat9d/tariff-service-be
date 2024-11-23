@@ -12,7 +12,7 @@ class Settings(BaseSettings):
 
     KAFKA_BROKER: str = "kafka:9092"
 
-    JWT_SECRET: str
+    JWT_SECRET: str = "09d25e094faa6ca2556c81816X6b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
     TOKEN_EXPIRATION_DELTA: int = 10
 
     DEBUG_ENGINE: bool = False
