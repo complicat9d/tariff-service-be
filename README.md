@@ -12,6 +12,10 @@
 
 
 ## Развёртывание в Docker
+Создать файл `.env`:
+```commandline
+touch .env
+```
 Пропишите команду:
 ```commandline
 docker compose up --build

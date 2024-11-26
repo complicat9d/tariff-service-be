@@ -20,6 +20,10 @@ services:
   db:
     image: postgres:16-alpine
     restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
     volumes:
       - ./postgres_db:/var/lib/postgresql/data
       - ./postgresql.conf:/etc/postgresql/postgresql.conf
